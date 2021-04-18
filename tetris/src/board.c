@@ -6,6 +6,7 @@
 SDL_Texture* cell_textures;
 struct Shape shapes[8];
 clock_t timer;
+float speed = 10;
 
 void init_textures(SDL_Renderer* renderer)
 {
@@ -104,6 +105,7 @@ void setup_board(struct GlobalState* state)
     memcpy(shapes[7].matrix.cells, s7, sizeof(s7));
 
     state->current_shape = shapes[I_BLOCK];
+    state->current_shape.x = 4;
 }
 
 void place_block(struct GlobalState* state)
@@ -123,9 +125,15 @@ void place_block(struct GlobalState* state)
     // Select new shape
     int idx = (rand() % 7) + 1;
     state->current_shape = shapes[idx];
+    state->current_shape.x = 4;
+    if (block_colliding(state))
+    {
+        state->game_over = true;
+    }
 
     // Check for line clears
     // Loop through each row and check if it is filled
+    int lines_cleared = 0;
     for (int y = 0; y < BOARD_HEIGHT; y++)
     {
         bool filled = true;
@@ -140,7 +148,23 @@ void place_block(struct GlobalState* state)
         if (filled)
         {
             clear_line(state, y);
+            lines_cleared++;
         }
+    }
+
+
+
+    if (lines_cleared)
+    {
+        switch (lines_cleared)
+        {
+            case 1: state->score += 40; break;
+            case 2: state->score += 100; break;
+            case 3: state->score += 300; break;
+            case 4: state->score += 1200; break;
+        };
+
+        printf("Current score: %d\n", state->score);
     }
 
 }
@@ -166,8 +190,9 @@ void clear_line(struct GlobalState* state, int line)
 
 void update(struct GlobalState* state)
 {
-    if (clock() - timer > CLOCKS_PER_SEC / 10)
+    if (clock() - timer > CLOCKS_PER_SEC / speed)
     {
+        speed += 0.1f;
         state->current_shape.y++;
         if (block_colliding(state))
         {

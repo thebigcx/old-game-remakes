@@ -38,6 +38,7 @@ struct Vector2
 extern SDL_Texture* cell_textures;
 extern struct Shape shapes[8];
 extern clock_t timer;
+extern float speed;
 
 struct GlobalState;
 
