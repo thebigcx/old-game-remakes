@@ -2,6 +2,7 @@
 #include "global.h"
 
 #include <SDL2/SDL_image.h>
+#include <time.h>
 
 SDL_Texture* cell_textures;
 struct Shape shapes[8];
